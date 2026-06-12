@@ -4,9 +4,9 @@ import java.sql.*;
 
 public class JdbcV3 {
     static String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    static String dburl = "jdbc:sqlserver://127.0.0.1:1433;databaseName=QLSV;encrypt=false";
-    static String username = "userQLSV";
-    static String password = "password";
+    static String dburl = "jdbc:sqlserver://127.0.0.1:1433;databaseName=GP;encrypt=false";
+    static String username = "sa";
+    static String password = "123456";
 
     static {
         try { // nạp driver

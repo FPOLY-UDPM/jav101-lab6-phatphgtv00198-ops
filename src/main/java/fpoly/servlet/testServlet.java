@@ -20,16 +20,20 @@ public class testServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Chạy hàm test in ra console của bạn (nếu cần xem ở dưới)
-        dao.checkDepartmentDAO();
-
-        // 1. Lấy mảng dữ liệu từ Model (Hàm findAll đã gộp của bạn và thầy)
+        // 1. Lấy danh sách dữ liệu từ Model (Gọi hàm findAll() hợp lệ trong DAO)
         List<Department> list = dao.findAll();
 
-        // 2. Đóng gói danh sách vào Request Attribute để gửi cho View (JSP)
+        // 2. [Tùy chọn] In ra Console để bạn kiểm tra nhanh dữ liệu giống như hàm check cũ
+        System.out.println("--- Kiểm tra dữ liệu lấy từ Database ---");
+        for (Department dept : list) {
+            System.out.println(dept.getId() + " | " + dept.getName() + " | " + dept.getDescription());
+        }
+        System.out.println("----------------------------------------");
+
+        // 3. Đóng gói danh sách vào Request Attribute để gửi cho View (JSP)
         req.setAttribute("departments", list);
 
-        // 3. Chuyển hướng sang file hiển thị department-list.jsp
+        // 4. Chuyển hướng sang file hiển thị department-list.jsp
         req.getRequestDispatcher("/view_dept/department-list.jsp").forward(req, resp);
     }
 }

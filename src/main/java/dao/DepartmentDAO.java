@@ -2,7 +2,7 @@ package dao;
 
 import entity.Department;
 import utils.JdbcV1;
-import utils.jdbcv2;
+import utils.jdbcv2; // Giữ nguyên import lỗi đặt tên của bạn để tránh lỗi dự án
 import utils.JdbcV3;
 
 import java.sql.Connection;
@@ -29,20 +29,20 @@ public class DepartmentDAO {
     private final String stmDELETE = "DELETE FROM [dbo].[Departments] WHERE [Id] = ?";
 
     // --- Stored Procedures (JDBC V3) ---
-    // Sử dụng cú pháp {call ...} là chuẩn JDBC giúp Tomcat và Driver tối ưu tốt nhất
-    private final String callSELECT = "{call spSelectAll}";
-    private final String callSELECT_byId = "{call spSelectById(?)}";
-    private final String callINSERT = "{call spInsert(?,?,?)}";
-    private final String callUPDATE = "{call spUpdate(?,?,?)}";
-    private final String callDELETE_byId = "{call spDeleteById(?)}";
+    private final String callSELECT = "exec spSelectAll";
+    private final String callSELECT_byId = "exec spSelectById ?";
+    private final String callSELECT_byName = "exec spSelectByName ?";
+    private final String callINSERT = "exec spInsert ?,?,?";
+    private final String callUPDATE = "exec spUpdate ?,?,?";
+    private final String callDELETE_byId = "exec spDeleteById ?";
 
     /**
-     * 1. Lấy toàn bộ danh sách phòng ban
+     * 1. Lấy toàn bộ danh sách phòng ban (Đã chuyển sang V3)
      */
     public List<Department> findAll() {
         List<Department> list = new ArrayList<>();
-        // Sử dụng try-with-resources để tự động đóng ResultSet tránh leak kết nối trên Tomcat
-        try (ResultSet resultSet = jdbcv2.executeQuery(stmSELECT)) {
+        // Đổi từ jdbcv2 sang JdbcV3 và truyền vào biến callSELECT
+        try (ResultSet resultSet = JdbcV3.executeQuery(callSELECT)) {
             while (resultSet.next()) {
                 Department dept = new Department();
                 dept.setId(resultSet.getString("Id"));
@@ -57,11 +57,12 @@ public class DepartmentDAO {
     }
 
     /**
-     * 2. Tìm kiếm phòng ban theo ID
+     * 2. Tìm kiếm phòng ban theo ID (Đã chuyển sang V3)
      */
     public Department findById(String id) {
-        Department dept = null; // Trả về null nếu không tìm thấy để Servlet dễ xử lý
-        try (ResultSet resultSet = jdbcv2.executeQuery(stmSELECT_byId, id)) {
+        Department dept = null;
+        // Đổi sang JdbcV3 và truyền biến callSELECT_byId cùng tham số id
+        try (ResultSet resultSet = JdbcV3.executeQuery(callSELECT_byId, id)) {
             if (resultSet.next()) {
                 dept = new Department();
                 dept.setId(resultSet.getString("Id"));
@@ -75,11 +76,12 @@ public class DepartmentDAO {
     }
 
     /**
-     * 3. Tìm kiếm phòng ban theo tên (Tìm kiếm tương đối)
+     * 3. Tìm kiếm phòng ban theo tên (Đã chuyển sang V3)
      */
     public List<Department> findByName(String name) {
         List<Department> list = new ArrayList<>();
-        try (ResultSet resultSet = jdbcv2.executeQuery(stmSELECT_byName, "%" + name + "%")) {
+        // Đổi sang JdbcV3 và dùng Stored Procedure tìm kiếm theo tên
+        try (ResultSet resultSet = JdbcV3.executeQuery(callSELECT_byName, "%" + name + "%")) {
             while (resultSet.next()) {
                 Department dept = new Department();
                 dept.setId(resultSet.getString("Id"));
@@ -94,7 +96,7 @@ public class DepartmentDAO {
     }
 
     /**
-     * 4. Thêm mới phòng ban
+     * 4. Thêm mới phòng ban (Giữ nguyên V3)
      */
     public int insert(Department dept) {
         try {
@@ -106,7 +108,7 @@ public class DepartmentDAO {
     }
 
     /**
-     * 5. Cập nhật thông tin phòng ban
+     * 5. Cập nhật thông tin phòng ban (Giữ nguyên V3)
      */
     public int update(Department dept) {
         try {
@@ -118,7 +120,7 @@ public class DepartmentDAO {
     }
 
     /**
-     * 6. Xóa phòng ban theo ID
+     * 6. Xóa phòng ban theo ID (Giữ nguyên V3)
      */
     public int delete(String id) {
         try {
